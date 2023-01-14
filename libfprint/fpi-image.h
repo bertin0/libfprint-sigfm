@@ -20,8 +20,9 @@
 
 #pragma once
 
-#include <config.h>
 #include "fp-image.h"
+#include "sigfm/sigfm.hpp"
+#include <config.h>
 
 /**
  * FpiImageFlags:
@@ -64,11 +65,12 @@ struct _FpImage
   FpiImageFlags flags;
 
   /*< private >*/
-  guint8    *data;
-  guint8    *binarized;
+  guint8      *data;
+  guint8      *binarized;
 
-  GPtrArray *minutiae;
-  guint      ref_count;
+  GPtrArray   *minutiae;
+  SigfmImgInfo * sigfm_info;
+  guint        ref_count;
 };
 
 gint fpi_std_sq_dev (const guint8 *buf,
@@ -77,8 +79,6 @@ gint fpi_mean_sq_diff_norm (const guint8 *buf1,
                             const guint8 *buf2,
                             gint          size);
 
-#if HAVE_PIXMAN
 FpImage *fpi_image_resize (FpImage *orig,
                            guint    w_factor,
                            guint    h_factor);
-#endif

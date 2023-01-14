@@ -145,6 +145,8 @@ driver_sources = {
         [ 'drivers/goodixtls/goodix52xd.c' ],
     'goodixtls53xd' :
         [ 'drivers/goodixtls/goodix53xd.c' ],
+    'fpcmoc' :
+        [ 'drivers/fpcmoc/fpc.c' ],
 }
 
 helper_sources = {
@@ -230,6 +232,8 @@ deps = [
     mathlib_dep,
 ] + optional_deps
 
+subdir('sigfm')
+
 # These are empty and only exist so that the include directories are created
 # in the build tree. This silences a build time warning.
 subdir('nbis/include')
@@ -252,13 +256,15 @@ libnbis = static_library('nbis',
     ]),
     install: false)
 
+priv_deps = deps + libsigfm
+
 libfprint_private = static_library('fprint-private',
     sources: [
         fpi_enums,
         libfprint_private_sources,
     ],
     dependencies: deps,
-    link_with: libnbis,
+    link_with: [libnbis, libsigfm],
     install: false)
 
 libfprint_drivers = static_library('fprint-drivers',
@@ -338,7 +344,7 @@ if install_udev_rules
     )
 endif
 
-custom_target('sync-udev-hwdb',
+sync_udev_udb = custom_target('sync-udev-hwdb',
     depends: udev_hwdb_generator,
     output: 'sync-udev-hwdb',
     install: false,
@@ -348,6 +354,8 @@ custom_target('sync-udev-hwdb',
         meson.source_root() / 'data'
     ]
 )
+
+alias_target('sync-udev-hwdb', sync_udev_udb)
 
 supported_devices = executable('fprint-list-supported-devices',
     'fprint-list-supported-devices.c',
